@@ -6,11 +6,6 @@ const LoginForm: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    setUsername("");
-    setPassword("");
-  }, []);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle login logic here
@@ -22,7 +17,7 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+    <div className="w-full max-w-md bg-white rounded-lg p-6">
       <h1 className="text-base text-center text-gray-800">เข้าใช้งานระบบสแกน QR Code</h1>
       <form className="mt-6" onSubmit={handleSubmit}>
         <div className="mb-4">
