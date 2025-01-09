@@ -29,8 +29,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <ThemeSwitcher />
-            <main>{children}</main>
+            <div className="dark:bg-black">
+                <ThemeSwitcher />
+              <main className="">
+                {children}
+              </main>
+            </div>
           </ThemeProvider>
       </body>
     </html>
