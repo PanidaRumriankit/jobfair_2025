@@ -15,21 +15,25 @@ const LoginForm: React.FC = () => {
       clearTimeout(timeoutId);
     }
 
-    setPassword((prev) => prev + newPassword.slice(-1));
+    if (newPassword.length < password.length) {
+      setPassword((prev) => prev.slice(0, -1));
+      setDisplayPassword((prev) => prev.slice(0, -1));
 
-    if (newPassword.length === 1) {
-      setDisplayPassword('•');
     } else {
-      setDisplayPassword((prev) => prev.slice(0, -1) + '•' + newPassword.slice(-1));
+      setPassword((prev) => prev + newPassword.slice(-1));
+
+      if (newPassword.length === 1) {
+        setDisplayPassword((prev) => prev.slice(0, -1) + newPassword.slice(-1));
+      } else {
+        setDisplayPassword((prev) => prev.slice(0, -1) + '•' + newPassword.slice(-1));
+      }
+
+      const id = setTimeout(() => {
+        setDisplayPassword((prev) => prev.slice(0, -1) + '•');
+      }, 500);
+
+      setTimeoutId(id);
     }
-
-    console.log(password);
-
-    const id = setTimeout(() => {
-      setDisplayPassword((prev) => prev.slice(0, -1) + '•');
-    }, 500);
-
-    setTimeoutId(id);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -41,6 +45,8 @@ const LoginForm: React.FC = () => {
   const isFormValid = () => {
     return username.length > 0 && password.length > 0;
   };
+
+  // console.log(password);
 
   return (
     <div className="w-full max-w-md bg-white dark:bg-black rounded-lg p-6">
