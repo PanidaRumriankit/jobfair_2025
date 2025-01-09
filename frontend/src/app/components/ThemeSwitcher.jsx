@@ -7,16 +7,20 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 
 export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!mounted) return null;
 
   return (
-    <div className="flex justify-space-between gap-0.5 items-center">
-      <LightModeIcon className="mr-2 dark:text-white" />
+    <div className="flex justify-space-between gap-0.5 items-center dark:text-white">
+      <LightModeIcon className="mr-2" />
       <button
         className={`relative w-12 h-6 rounded-full ${
-          theme === 'dark' ? 'bg-black' : 'bg-green-500'
+          theme === 'dark' ? 'bg-gray-500' : 'bg-green-500'
         } transition`}
         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       >
@@ -26,7 +30,7 @@ export default function ThemeSwitcher() {
           }`}
         />
       </button>
-      <Brightness3Icon className="dark:text-white"/>
+      <Brightness3Icon />
     </div>
   );
 };
