@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import LoginForm from "./components/LoginForm";
+import Loading from "./components/Loading";
 import white_logo from "../../public/white_logo.png";
 import dark_logo from "../../public/dark_logo.png";
 import Image from "next/image";
@@ -15,7 +16,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return (<div className="min-h-screen bg-white dark:bg-black"></div>);
+  if (!mounted) return <Loading />;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-black">

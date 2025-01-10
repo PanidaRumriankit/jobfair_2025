@@ -4,6 +4,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import Brightness3Icon from '@mui/icons-material/Brightness3';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import Loading from "./Loading";
 
 export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
@@ -13,7 +14,7 @@ export default function ThemeSwitcher() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted) return <Loading />;
 
   return (
     <div className="flex justify-space-between gap-0.5 items-center dark:text-white">
