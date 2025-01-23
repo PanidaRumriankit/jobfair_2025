@@ -1,8 +1,12 @@
 // components/loginForm.tsx
 "use client";
+
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
+import "../../../i18n";
 
 const LoginForm: React.FC = () => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [displayPassword, setDisplayPassword] = useState(''); // Used to display the visible password temporarily
@@ -50,17 +54,17 @@ const LoginForm: React.FC = () => {
 
   return (
     <div className="w-full max-w-md bg-white dark:bg-black rounded-lg p-6">
-      <h1 className="text-base text-center text-gray-800 dark:text-white">เข้าใช้งานระบบสแกน QR Code</h1>
+      <h1 className="text-base text-center text-gray-800 dark:text-white">{t('login')}</h1>
       <form className="mt-6" onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="username" className="block text-sm font-medium text-[#334151] dark:text-[#CCCFD3]">
-            ชื่อบัญชีผู้ใช้งาน
+            {t('username')}
           </label>
           <input
             type="username"
             id="username"
             value={username}
-            placeholder="เช่น wtxqn, jtwed"
+            placeholder={t('exusername')}
             onChange={(e) => setUsername(e.target.value)}
             required
             className="w-full px-3 py-2 border rounded-lg dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
@@ -68,13 +72,13 @@ const LoginForm: React.FC = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="password" className="block text-sm font-medium text-[#334151] dark:text-[#CCCFD3]">
-            รหัสผ่าน
+            {t('password')}
           </label>
           <input
             type="text"
             id="password"
             value={displayPassword}
-            placeholder="รหัสผ่านผู้ใช้งาน"
+            placeholder={t('expassword')}
             onChange={handlePasswordChange}
             required
             className="w-full px-3 py-2 dark:text-white border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
@@ -88,7 +92,7 @@ const LoginForm: React.FC = () => {
             }`}
             disabled={!isFormValid()}
           >
-            เข้าสู่ระบบ
+            {t('button')}
           </button>
         </div>
       </form>

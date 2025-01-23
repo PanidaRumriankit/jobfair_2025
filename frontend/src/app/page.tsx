@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 import LoginForm from "./components/LoginForm";
 import Loading from "./components/Loading";
 import white_logo from "../../public/white_logo.png";
 import dark_logo from "../../public/dark_logo.png";
-import Image from "next/image";
+import '../../i18n';
 
 export default function Home() {
   const { theme } = useTheme();
