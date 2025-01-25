@@ -14,16 +14,18 @@ export default function RootLayout({
   
   return (
     <html lang="en">
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem={true}
-        disableTransitionOnChange={true}
+      <body
+        className={`${inter.className} antialiased`}
       >
-        <body className={`${inter.className} antialiased`}>
-          <main>{children}</main>
-        </body>
-      </ThemeProvider>
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem={true}
+            disableTransitionOnChange={true}
+          >
+            <main>{children}</main>
+          </ThemeProvider>
+      </body>
     </html>
   );
 }
