@@ -1,5 +1,5 @@
 import { Image } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 interface AttachFileButtonProps {
   onFileChange: (file: File) => void;
@@ -20,12 +20,24 @@ const AttachFileButton: React.FC<AttachFileButtonProps> = ({ onFileChange }) => 
     }
   };
 
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handlePress = () => setIsPressed(true);
+  const handleRelease = () => setIsPressed(false);
+
   return (
     <>
       {/* Attach file button */}
       <button
         onClick={handleClick}
-        className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-200 transition-colors duration-200"
+        onTouchStart={handlePress}
+        onTouchEnd={handleRelease}
+        onMouseDown={handlePress}
+        onMouseUp={handleRelease}
+        onMouseLeave={handleRelease}
+        className={`p-3 bg-white text-black rounded-full shadow-lg hover:bg-gray-200 transition-colors ${
+          isPressed ? "bg-gray-200" : "bg-white"
+        }`}
       >
         <Image className="w-6 h-6 text-gray-700" />
       </button>
