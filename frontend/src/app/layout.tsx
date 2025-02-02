@@ -18,13 +18,13 @@ export default function RootLayout({
         className={`${inter.className} antialiased`}
       >
         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem={true}
-            disableTransitionOnChange={true}
-          >
-            <main>{children}</main>
-          </ThemeProvider>
+          attribute="class"
+          defaultTheme="system"
+          enableSystem={true}
+          disableTransitionOnChange={true}
+        >
+          <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );
