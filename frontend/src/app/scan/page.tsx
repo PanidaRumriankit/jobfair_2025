@@ -12,14 +12,17 @@ const Scan: React.FC = () => {
   const cameraRef = useRef<CameraHandle | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsClient(true);
     const updateDimensions = () => {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight
+        });
+      }
     };
 
     updateDimensions();
@@ -108,24 +111,37 @@ const Scan: React.FC = () => {
   }
 
   // Calculate center position
-  const centerX = (dimensions.width - SQUARE_SIZE) / 2;
-  const centerY = (dimensions.height - SQUARE_SIZE) / 2;
+  const centerX = Math.max(0, (dimensions.width - SQUARE_SIZE) / 2);
+  const centerY = Math.max(0, (dimensions.height - SQUARE_SIZE) / 2);
 
   return (
-    <div className="relative h-screen w-screen">
-      <div className="w-full h-full">
+    <div ref={containerRef} className="relative h-screen w-screen overflow-hidden">
+      {/* Camera */}
+      <div className="absolute inset-0">
         <Camera ref={cameraRef} />
       </div>
 
-      {/* Overlays */}
+      {/* Top text */}
+      <div 
+        className="absolute left-1/2 transform -translate-x-1/2 text-white text-2xl z-50"
+        style={{ top: `${Math.max(20, centerY - 40)}px` }}
+      >
+        {"<<ชื่อบริษัท>>"}
+      </div>
+
+      {/* Top overlay */}
       <div 
         className="absolute top-0 left-0 right-0 bg-black/50"
         style={{ height: `${centerY}px` }}
       />
+
+      {/* Bottom overlay */}
       <div 
         className="absolute bottom-0 left-0 right-0 bg-black/50"
         style={{ height: `${centerY}px` }}
       />
+
+      {/* Left overlay */}
       <div 
         className="absolute bg-black/50"
         style={{
@@ -135,6 +151,8 @@ const Scan: React.FC = () => {
           height: `${SQUARE_SIZE}px`
         }}
       />
+
+      {/* Right overlay */}
       <div 
         className="absolute bg-black/50"
         style={{
@@ -146,7 +164,16 @@ const Scan: React.FC = () => {
       />
 
       {/* Corner markers */}
-      <div className="absolute" style={{ left: `${centerX}px`, top: `${centerY}px`, width: `${SQUARE_SIZE}px`, height: `${SQUARE_SIZE}px` }}>
+      <div 
+        className="absolute"
+        style={{
+          left: `${centerX}px`,
+          top: `${centerY}px`,
+          width: `${SQUARE_SIZE}px`,
+          height: `${SQUARE_SIZE}px`,
+          zIndex: 40
+        }}
+      >
         {/* Top-left corner */}
         <div className="absolute top-0 left-0">
           <div className="absolute border-l-2 border-white h-5" />
@@ -168,7 +195,7 @@ const Scan: React.FC = () => {
         {/* Bottom-right corner */}
         <div className="absolute bottom-0 right-0">
           <div className="absolute border-r-2 border-white h-5" style={{ bottom: 0 }} />
-          <div className="absolute border-b-2 border-white w-5" style={{ bottom: 0, right: 0 }} />
+          <div className="absolute border-b-2 border-white w-5" style={{ right: 0 }} />
         </div>
       </div>
 
