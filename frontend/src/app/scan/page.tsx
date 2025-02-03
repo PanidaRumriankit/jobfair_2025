@@ -4,6 +4,7 @@ import Camera, { CameraHandle } from "@/components/Camera";
 import PhotoButton from "@/components/PhotoButton";
 import AttachFileButton from "@/components/AttachFileButton";
 import SwitchCameraButton from "@/components/SwitchCameraButton";
+import logo from "../../../public/jobfair_logo.png";
 import { useRef, useState, useEffect } from "react";
 
 const SQUARE_SIZE = 128;
@@ -119,6 +120,11 @@ const Scan: React.FC = () => {
       {/* Camera */}
       <div className="absolute inset-0">
         <Camera ref={cameraRef} />
+      </div>
+
+      {/* Logo */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-50">
+        <img src={logo.src} alt="Logo" className="w-24" />
       </div>
 
       {/* Top text */}
