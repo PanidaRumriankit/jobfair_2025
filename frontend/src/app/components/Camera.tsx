@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
-import { ErrorPopup } from "./ErrorPopup";
+import ErrorPopup from "@/components/ErrorPopup";
 
 export type CameraHandle = {
   capture: () => string | null;

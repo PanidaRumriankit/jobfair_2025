@@ -13,7 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import "../../../i18n";
 
-export function ErrorPopup() {
+export default function ErrorPopup() {
   const { t } = useTranslation();
 
   return (
