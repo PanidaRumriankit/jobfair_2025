@@ -4,6 +4,8 @@ import Camera, { CameraHandle } from "@/components/Camera";
 import PhotoButton from "@/components/PhotoButton";
 import AttachFileButton from "@/components/AttachFileButton";
 import SwitchCameraButton from "@/components/SwitchCameraButton";
+import SuccessPopup from "@/components/SuccessPopup";
+import ErrorPopup from "@/components/ErrorPopup";
 import logo from "../../../public/jobfair_logo.png";
 import { useRef, useState, useEffect } from "react";
 
@@ -89,10 +91,37 @@ const Scan: React.FC = () => {
       if (imageSrc) {
         const croppedImage = await cropImageToSquare(imageSrc);
         console.log("Cropped image:", croppedImage);
+  
+        // Convert base64 to Blob
+        const blob = await fetch(croppedImage).then((res) => res.blob());
+  
+        // Create a FormData object
+        const formData = new FormData();
+        formData.append("file", blob, "image.png");
+  
+        try {
+          const response = await fetch("https://backend-api.com/upload", {
+            method: "POST",
+            body: formData,
+          });
+  
+          if (response.ok) {
+            <SuccessPopup />
+          } else {
+            <ErrorPopup />
+            const errorData = await response.json();
+            console.error("Image upload failed:", errorData);
+          }
+        } catch (error) {
+          <ErrorPopup />
+          console.error("Error uploading image:", error);
+        }
       } else {
+        <ErrorPopup />
         console.error("Failed to capture image");
       }
     } else {
+      <ErrorPopup />
       console.error("Camera ref is null");
     }
   };
