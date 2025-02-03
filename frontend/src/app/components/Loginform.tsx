@@ -40,10 +40,33 @@ const LoginForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log({ email: username, password });
+  
+    const formData = {
+      username,
+      password,
+    };
+  
+    try {
+      const response = await fetch("https://backend-api.com/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Login successful:", data);
+      } else {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData);
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
   };
 
   const isFormValid = () => {
