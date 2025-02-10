@@ -22,8 +22,8 @@ export default function Home() {
   if (!mounted) return <Loading />;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-black">
-      <div className="flex justify-end gap-4 mb-12 ml-96">
+    <div className="min-h-screen flex flex-col justify-center bg-white dark:bg-discord">
+      <div className="flex justify-end gap-4 mr-12 mb-8">
         <ThemeSwitcher />
         <LanguageSwitcher />
       </div>
