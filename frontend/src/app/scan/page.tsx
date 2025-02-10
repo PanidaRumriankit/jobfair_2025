@@ -10,7 +10,7 @@ import ErrorPopup from "@/components/ErrorPopup";
 import logo from "../../../public/jobfair_logo.png";
 import { useRef, useState, useEffect } from "react";
 
-const SQUARE_SIZE = 128;
+const SQUARE_SIZE = 256;
 
 const Scan: React.FC = () => {
   const cameraRef = useRef<CameraHandle | null>(null);
