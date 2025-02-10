@@ -76,7 +76,7 @@ const LoginForm: React.FC = () => {
   // console.log(password);
 
   return (
-    <div className="w-full max-w-md bg-white dark:bg-black rounded-lg p-6">
+    <div className="w-full max-w-md bg-white dark:bg-discord rounded-lg p-6">
       <h1 className="text-base text-center text-gray-800 dark:text-white">{t('login')}</h1>
       <form className="mt-6" onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -90,7 +90,7 @@ const LoginForm: React.FC = () => {
             placeholder={t('exusername')}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className="w-full px-3 py-2 border rounded-lg dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
+            className="w-full px-3 py-2 border rounded-lg dark:bg-discord dark:text-white focus:outline-none focus:ring focus:ring-blue-300"
           />
         </div>
         <div className="mb-4">
@@ -104,7 +104,7 @@ const LoginForm: React.FC = () => {
             placeholder={t('expassword')}
             onChange={handlePasswordChange}
             required
-            className="w-full px-3 py-2 dark:text-white border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            className="w-full px-3 py-2 dark:bg-discord dark:text-white border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
           />
         </div>
         <div className="flex justify-center">
