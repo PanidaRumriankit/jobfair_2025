@@ -9,6 +9,7 @@ i18n
     resources: {
       en: {
         translation: {
+          loading: 'Loading...',
           login: 'Log in to scan QR code',
           username: 'Username',
           exusername: 'Ex. wtxqn, jtwed, etc.',
@@ -24,6 +25,7 @@ i18n
       th: {
         translation: {
           login: 'เข้าใช้งานระบบสแกน QR Code',
+          loading: 'กำลังโหลด...',
           username: 'ชื่อบัญชีผู้ใช้งาน',
           exusername: 'เช่น wtxqn, jtwed, เป็นต้น',
           password: 'รหัสผ่าน',
