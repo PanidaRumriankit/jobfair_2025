@@ -5,14 +5,14 @@ import ErrorPopup from "@/components/ErrorPopup";
 
 export type CameraHandle = {
   capture: () => string | null;
-  switchCamera: () => void; // switch between front and back cameras
+  switchCamera: () => void;
 };
 
 const Camera = forwardRef<CameraHandle>((props, ref) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const [error, setError] = useState(false);
-  const [facingMode, setFacingMode] = useState<"user" | "environment">("user"); // Track camera mode
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
   useEffect(() => {
     const getCameraStream = async () => {
@@ -31,7 +31,7 @@ const Camera = forwardRef<CameraHandle>((props, ref) => {
           videoRef.current.srcObject = stream;
         }
       } catch (err) {
-        setError(true);
+        setErrorMessage("Failed to access camera. Please check permissions.");
       }
     };
 
@@ -54,19 +54,21 @@ const Camera = forwardRef<CameraHandle>((props, ref) => {
         const context = canvas.getContext("2d");
         if (context) {
           context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-          return canvas.toDataURL("image/jpeg"); // Return image as base64
+          return canvas.toDataURL("image/jpeg");
         }
       }
       return null;
     },
     switchCamera: () => {
-      setFacingMode((prev) => (prev === "user" ? "environment" : "user")); // Toggle camera
+      setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
     },
   }));
 
   return (
     <div className="relative w-full h-screen">
-      {error && <ErrorPopup />}
+      {errorMessage && (
+        <ErrorPopup message={errorMessage} onClose={() => setErrorMessage(null)} isOpen={!!errorMessage} />
+      )}
       <video
         ref={videoRef}
         autoPlay
