@@ -11,7 +11,9 @@ export default {
   	extend: {
   		colors: {
   			background: 'var(--background)',
-  			foreground: 'var(--foreground)'
+  			foreground: 'var(--foreground)',
+			discord: '#201c24',
+			lighterdiscord: '#38343c'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
