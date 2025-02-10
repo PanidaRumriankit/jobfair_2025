@@ -5,6 +5,7 @@ import PhotoButton from "@/components/PhotoButton";
 import AttachFileButton from "@/components/AttachFileButton";
 import SwitchCameraButton from "@/components/SwitchCameraButton";
 import SuccessPopup from "@/components/SuccessPopup";
+import SessionTimeout from "@/components/SessionTimeout";
 import ErrorPopup from "@/components/ErrorPopup";
 import logo from "../../../public/jobfair_logo.png";
 import { useRef, useState, useEffect } from "react";
@@ -16,6 +17,10 @@ const Scan: React.FC = () => {
   const [isClient, setIsClient] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [showMessage, setShowMessage] = useState("");
+  const [showSessionTimeout, setShowSessionTimeout] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -106,25 +111,27 @@ const Scan: React.FC = () => {
           });
   
           if (response.ok) {
-            <SuccessPopup />
+            setShowSuccessPopup(true);
           } else {
-            <ErrorPopup />
+            setShowErrorPopup(true);
             const errorData = await response.json();
+            setShowMessage("Image upload failed: " + errorData.message);
             console.error("Image upload failed:", errorData);
           }
         } catch (error) {
-          <ErrorPopup />
-          console.error("Error uploading image:", error);
+          setShowErrorPopup(true);
+          setShowMessage("Error uploading image");
         }
       } else {
-        <ErrorPopup />
-        console.error("Failed to capture image");
+        setShowErrorPopup(true);
+        setShowMessage("Failed to capture image");
       }
     } else {
-      <ErrorPopup />
-      console.error("Camera ref is null");
+      setShowErrorPopup(true);
+      setShowMessage("Camera ref is null");
     }
   };
+
 
   const handleFileChange = (file: File) => {
     console.log("Selected file:", file);
@@ -157,11 +164,8 @@ const Scan: React.FC = () => {
       </div>
 
       {/* Top text */}
-      <div 
-        className="absolute left-1/2 transform -translate-x-1/2 text-white text-2xl z-50"
-        style={{ top: `${Math.max(20, centerY - 40)}px` }}
-      >
-        {"<<ชื่อบริษัท>>"}
+      <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-50">
+        <p className="text-white text-xl">KU Tech จำกัด</p>
       </div>
 
       {/* Top overlay */}
@@ -244,6 +248,25 @@ const Scan: React.FC = () => {
       <div className="absolute bottom-8 left-3/4 transform -translate-x-1/2 -translate-y-1/3 z-[9999] flex items-center gap-4">
         <SwitchCameraButton onClick={handleSwitchCamera} />
       </div>
+
+      {/* Success popup */}
+      <SuccessPopup
+        isOpen={showSuccessPopup}
+        onClose={() => setShowSuccessPopup(false)}
+      />
+      
+      {/* Error popup */}
+      <ErrorPopup
+        message={showMessage}
+        isOpen={showErrorPopup}
+        onClose={() => setShowErrorPopup(false)}
+      />
+
+      {/* Session timeout */}
+      <SessionTimeout
+        isOpen={showSessionTimeout}
+        onClose={() => setShowSessionTimeout(false)}
+      />
     </div>
   );
 };
