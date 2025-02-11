@@ -13,27 +13,15 @@ const SQUARE_SIZE = 256;
 
 const Scan: React.FC = () => {
   const cameraRef = useRef<CameraHandle | null>(null);
-  const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [showMessage, setShowMessage] = useState("");
   const [isCameraOn, setIsCameraOn] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight,
-        });
-      }
-    };
-
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-
-    return () => window.removeEventListener("resize", updateDimensions);
+    setDimensions({ width: window.innerWidth, height: window.innerHeight });
   }, []);
 
   useEffect(() => {
