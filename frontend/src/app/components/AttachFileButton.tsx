@@ -39,7 +39,7 @@ const AttachFileButton: React.FC<AttachFileButtonProps> = ({ onFileChange }) => 
           isPressed ? "bg-gray-200" : "bg-white"
         }`}
       >
-        <Image className="w-6 h-6 text-gray-700" />
+        <Image className="w-8 h-8 text-gray-700" />
       </button>
 
       {/* Hidden file input */}
