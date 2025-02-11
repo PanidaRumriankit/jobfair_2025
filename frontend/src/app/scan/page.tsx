@@ -15,7 +15,7 @@ const SQUARE_SIZE = 256;
 const Scan: React.FC = () => {
   const cameraRef = useRef<CameraHandle | null>(null);
   const [isClient, setIsClient] = useState(false);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
   const containerRef = useRef<HTMLDivElement>(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
@@ -150,6 +150,8 @@ const Scan: React.FC = () => {
   // Calculate center position
   const centerX = Math.max(0, (dimensions.width - SQUARE_SIZE) / 2);
   const centerY = Math.max(0, (dimensions.height - SQUARE_SIZE) / 2);
+
+  console.log("centerY:", centerY, "dimensions.height:", dimensions.height);
 
   return (
     <div ref={containerRef} className="relative h-screen w-screen overflow-hidden bg-discord">
