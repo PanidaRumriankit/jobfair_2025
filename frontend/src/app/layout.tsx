@@ -1,10 +1,10 @@
 "use client";
 
-import { Inter } from 'next/font/google';
-import { ThemeProvider } from "next-themes"
+import { Noto_Sans_Thai } from 'next/font/google';
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] });
+const notoSansThai = Noto_Sans_Thai({ subsets: ['thai', 'latin'] });
 
 export default function RootLayout({
   children,
@@ -13,9 +13,9 @@ export default function RootLayout({
 }>) {
   
   return (
-    <html lang="en">
+    <html lang="th">
       <body
-        className={`${inter.className} antialiased`}
+        className={`${notoSansThai.className} antialiased`}
       >
         <ThemeProvider
           attribute="class"
