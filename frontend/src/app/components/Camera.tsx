@@ -6,6 +6,7 @@ import ErrorPopup from "@/components/ErrorPopup";
 export type CameraHandle = {
   capture: () => string | null;
   switchCamera: () => void;
+  getVideoElement: () => HTMLVideoElement | null;
 };
 
 const Camera = forwardRef<CameraHandle>((props, ref) => {
@@ -61,6 +62,9 @@ const Camera = forwardRef<CameraHandle>((props, ref) => {
     },
     switchCamera: () => {
       setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
+    },
+    getVideoElement: () => {
+      return videoRef.current;
     },
   }));
 
