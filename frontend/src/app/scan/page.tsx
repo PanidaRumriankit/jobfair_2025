@@ -152,7 +152,7 @@ const Scan: React.FC = () => {
   const centerY = Math.max(0, (dimensions.height - SQUARE_SIZE) / 2);
 
   return (
-    <div ref={containerRef} className="relative h-screen w-screen overflow-hidden">
+    <div ref={containerRef} className="relative h-screen w-screen overflow-hidden bg-discord">
       {/* Camera */}
       <div className="absolute inset-0">
         <Camera ref={cameraRef} />
@@ -160,11 +160,11 @@ const Scan: React.FC = () => {
 
       {/* Logo */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-50">
-        <img src={logo.src} alt="Logo" className="w-24" />
+        <img src={logo.src} alt="Logo" className="w-36" />
       </div>
 
       {/* Top text */}
-      <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-50">
+      <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50">
         <p className="text-white text-xl">KU Tech จำกัด</p>
       </div>
 
