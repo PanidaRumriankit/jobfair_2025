@@ -2,26 +2,42 @@
 
 import Camera, { CameraHandle } from "@/components/Camera";
 import { useRef, useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ChevronLeft } from 'lucide-react';
 import jsQR from "jsqr";
 import SuccessPopup from "@/components/SuccessPopup";
 import ErrorPopup from "@/components/ErrorPopup";
 import AttachFileButton from "@/components/AttachFileButton";
 import CameraToggleButton from "@/components/CameraToggleButton";
+import Loading from "@/components/Loading";
 import logo from "../../../public/jobfair_logo.png";
 
 const SQUARE_SIZE = 256;
 
 const Scan: React.FC = () => {
+  // const { data: session, status } = useSession();
+  const router = useRouter();
   const cameraRef = useRef<CameraHandle | null>(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [showMessage, setShowMessage] = useState("");
   const [isCameraOn, setIsCameraOn] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    setMounted(true);
+
+    const updateDimensions = () => {
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+
+    return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
   useEffect(() => {
@@ -132,6 +148,9 @@ const Scan: React.FC = () => {
     };
   }, []);
   
+  if (!mounted) {
+    return <Loading />;
+  }
 
   const handleFileChange = async (file: File) => {
     const formData = new FormData();
@@ -186,6 +205,13 @@ const Scan: React.FC = () => {
       <div className="absolute inset-0">
         {isCameraOn && <Camera ref={cameraRef} />}
       </div>
+
+      <button
+        className="absolute top-8 left-8 z-50"
+        onClick={() => router.push("/")}
+      >
+        <ChevronLeft size={32} color="white" />
+      </button>
 
       {/* Logo */}
       <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50">
