@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import LoginForm from "@/components/LoginForm";
 import Loading from "@/components/Loading";
@@ -13,13 +14,14 @@ import '../../i18n';
 
 export default function Home() {
   const { theme } = useTheme();
+  const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) return <Loading />;
+  if (!mounted || status === "loading") return <Loading />;
 
   return (
     <div className="min-h-screen flex flex-col justify-center bg-white dark:bg-discord">
@@ -29,7 +31,11 @@ export default function Home() {
       </div>
       <div className="flex flex-col items-center justify-center gap-8">
         <Image src={theme === "dark" ? dark_logo : white_logo} alt="KU Job Fair logo" width="228" height="159" />
-        <LoginForm />
+        {session ? (
+          <p className="text-l dark:text-white">{session?.user?.username}</p>
+        ) : (
+          <LoginForm />
+        )}
       </div>
     </div>
   );
