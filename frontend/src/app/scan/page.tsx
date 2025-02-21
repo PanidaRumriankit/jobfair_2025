@@ -1,8 +1,8 @@
 "use client";
 
 import Camera, { CameraHandle } from "@/components/Camera";
-import { useRef, useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useRef, useState, useEffect, useCallback } from "react";
+// import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from 'lucide-react';
 import jsQR from "jsqr";
@@ -19,9 +19,11 @@ const Scan: React.FC = () => {
   // const { data: session, status } = useSession();
   const router = useRouter();
   const cameraRef = useRef<CameraHandle | null>(null);
+  const [loading, setLoading] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [showMessage, setShowMessage] = useState("");
+  const [ssid, setSsid] = useState<string | undefined>(undefined);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -41,8 +43,30 @@ const Scan: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/users/profile", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (response.ok) {
+          //
+        } else {
+          router.push("/");
+        }
+      } catch (error) {
+        router.push("/");
+      }
+      setLoading(false);
+    };
+
+    checkSession();
+  }, []);
+
+  useEffect(() => {
     const detectQRCode = async () => {
       const videoElement = cameraRef.current?.getVideoElement();
+
       if (videoElement) {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -54,7 +78,7 @@ const Scan: React.FC = () => {
 
         // Calculate the center position of the cropped area
         const centerX = (dimensions.width - SQUARE_SIZE) / 2;
-        const centerY = (dimensions.height - SQUARE_SIZE) / 2;
+        const centerY = (videoElement.videoHeight - SQUARE_SIZE) / 2;
 
         // Calculate scaling factors
         const scaleX = videoElement.videoWidth / videoElement.offsetWidth;
@@ -83,23 +107,43 @@ const Scan: React.FC = () => {
         );
 
         const imageData = ctx.getImageData(0, 0, SQUARE_SIZE, SQUARE_SIZE);
+
+        // console.log("ImageData:", imageData);
+
+        const debugCanvas = document.createElement("canvas");
+        debugCanvas.width = SQUARE_SIZE;
+        debugCanvas.height = SQUARE_SIZE;
+        const debugCtx = debugCanvas.getContext("2d");
+
+        if (debugCtx) {
+          debugCtx.putImageData(imageData, 0, 0);
+          const dataUrl = debugCanvas.toDataURL("image/png");
+          // console.log("Cropped Image:", dataUrl);
+        }
+
         const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-        if (code) {
-          const croppedImageSrc = canvas.toDataURL("image/png");
-          const blob = await fetch(croppedImageSrc).then((res) => res.blob());
+        // console.log("QR Code Result:", code ? code.data : "No QR detected");
 
+        if (code && code.data) {
+          // console.log("QR Code Data:", code.data);
           try {
-            const formData = new FormData();
-            formData.append("file", blob, "cropped-qrcode.png");
-
-            const response = await fetch("https://backend-api.com/upload", {
+            const formData = {
+              studentId: code.data,
+            };
+        
+            const response = await fetch("http://localhost:3000/users/send", {
               method: "POST",
-              body: formData,
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+              credentials: "include",
             });
-
+        
             if (response.ok) {
               setShowSuccessPopup(true);
+              setSsid(code.data);
             } else {
               const errorData = await response.json();
               setShowMessage(`Error: ${errorData.message}`);
@@ -109,13 +153,22 @@ const Scan: React.FC = () => {
             setShowMessage("Failed to upload cropped image");
             setShowErrorPopup(true);
           }
-        }
+        } else {
+          console.log("No QR code detected.");
+        }        
       }
     };
 
     const interval = setInterval(detectQRCode, 500);
     return () => clearInterval(interval);
   }, [dimensions]);
+
+  const handleSwitchCamera = useCallback(() => {
+    if (cameraRef.current) {
+      cameraRef.current.switchCamera();
+    }
+  }, []);
+  
 
   useEffect(() => {
     let lastTap = 0;
@@ -148,37 +201,64 @@ const Scan: React.FC = () => {
     };
   }, []);
   
-  if (!mounted) {
-    return <Loading />;
-  }
+  if (!mounted || loading) return <Loading />;
 
   const handleFileChange = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
+    const reader = new FileReader();
   
-    try {
-      const response = await fetch("https://backend-api.com/upload", {
-        method: "POST",
-        body: formData,
-      });
+    reader.onload = async (event) => {
+      const image = new Image();
+      image.src = event.target?.result as string;
   
-      if (response.ok) {
-        setShowSuccessPopup(true);
-      } else {
-        const errorData = await response.json();
-        setShowMessage(`Error: ${errorData.message}`);
-        setShowErrorPopup(true);
-      }
-    } catch (error) {
-      setShowMessage("Failed to upload file");
-      setShowErrorPopup(true);
-    }
-  };
-
-  const handleSwitchCamera = () => {
-    if (cameraRef.current) {
-      cameraRef.current.switchCamera();
-    }
+      image.onload = async () => {
+        // Draw the image on a canvas
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        if (!context) return;
+  
+        canvas.width = image.width;
+        canvas.height = image.height;
+        context.drawImage(image, 0, 0, image.width, image.height);
+  
+        // Get image data from the canvas
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, canvas.width, canvas.height);
+  
+        if (code) {
+          try {
+            const formData = {
+              studentId: code.data,
+            };
+  
+            const response = await fetch("http://localhost:3000/users/send", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+              credentials: "include",
+            });
+  
+            if (response.ok) {
+              setSsid(code.data);
+              setShowSuccessPopup(true);
+            } else {
+              const errorData = await response.json();
+              setShowMessage(`Error: ${errorData.message}`);
+              setShowErrorPopup(true);
+            }
+          } catch (error) {
+            setShowMessage("Failed to upload QR data");
+            setShowErrorPopup(true);
+          }
+        } else {
+          setShowMessage("No QR code found in the image.");
+          setShowErrorPopup(true);
+        }
+      };
+    };
+  
+    reader.readAsDataURL(file);
   };
 
   const toggleCamera = () => {
@@ -193,7 +273,6 @@ const Scan: React.FC = () => {
       return !prev;
     });
   };
-  
 
   // Calculate center position for the overlay
   const centerX = Math.max(0, (dimensions.width - SQUARE_SIZE) / 2);
@@ -267,6 +346,7 @@ const Scan: React.FC = () => {
 
       {/* Success Popup */}
       <SuccessPopup
+        ssid={ssid}
         isOpen={showSuccessPopup}
         onClose={() => setShowSuccessPopup(false)}
       />
