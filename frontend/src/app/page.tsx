@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import LoginForm from "@/components/LoginForm";
 import Loading from "@/components/Loading";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import LanguageSwitcher from "./components/LanguageSwitcher";
+import { ChevronRight } from 'lucide-react';
 import white_logo from "../../public/white_logo.png";
 import dark_logo from "../../public/dark_logo.png";
-import '../../i18n';
 
 const useAuth = () => {
   const [user, setUser] = useState<string | null>(null);
@@ -41,6 +43,8 @@ const useAuth = () => {
 };
 
 export default function Home() {
+  const { t } = useTranslation();
+  const router = useRouter();
   const { theme } = useTheme();
   const { user, loading, setUser } = useAuth();
   const [mounted, setMounted] = useState(false);
@@ -60,7 +64,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center gap-8">
         <Image src={theme === "dark" ? dark_logo : white_logo} alt="KU Job Fair logo" width="228" height="159" />
         {user ? (
-          <div className="text-l dark:text-white">
+          <div className="flex flex-col items-center justify-center text-l dark:text-white">
             <p>{user}</p>
             <button
               onClick={async () => {
@@ -72,7 +76,15 @@ export default function Home() {
               }}
               className="mt-4 p-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
-              Logout
+              {t("logoutbutton")}
+            </button>
+            <button
+              onClick={() => {
+                router.push("/scan");
+              }}
+              className="mt-16 p-2 bg-[#02BC77] hover:bg-[#07B474] text-white rounded"
+            >
+              <ChevronRight />
             </button>
           </div>
         ) : (
