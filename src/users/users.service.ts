@@ -19,4 +19,18 @@ export class UsersService {
     }
     return user;
   }
+
+  async sendStudentId(username: string, body: any): Promise<User> {
+    const user = await this.userModel
+      .findOneAndUpdate(
+        { username: username },
+        { $addToSet: { studentIds: body.studentId } },
+        { new: true },
+      )
+      .exec();
+    if (!user) {
+      throw new NotFoundException(`User ${username} not found`);
+    }
+    return user;
+  }
 }
