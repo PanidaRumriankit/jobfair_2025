@@ -2,7 +2,6 @@
 
 import Camera, { CameraHandle } from "@/components/Camera";
 import { useRef, useState, useEffect, useCallback } from "react";
-// import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from 'lucide-react';
 import jsQR from "jsqr";
@@ -28,6 +27,30 @@ const Scan: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [user, setUser] = useState({
+    company: "",
+    username: "",
+  });
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/users/profile", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+      setLoading(false);
+    };
+
+    checkSession();
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -40,27 +63,6 @@ const Scan: React.FC = () => {
     window.addEventListener("resize", updateDimensions);
 
     return () => window.removeEventListener("resize", updateDimensions);
-  }, []);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/users/profile", {
-          method: "GET",
-          credentials: "include",
-        });
-        if (response.ok) {
-          //
-        } else {
-          router.push("/");
-        }
-      } catch (error) {
-        router.push("/");
-      }
-      setLoading(false);
-    };
-
-    checkSession();
   }, []);
 
   useEffect(() => {
@@ -110,17 +112,6 @@ const Scan: React.FC = () => {
 
         // console.log("ImageData:", imageData);
 
-        const debugCanvas = document.createElement("canvas");
-        debugCanvas.width = SQUARE_SIZE;
-        debugCanvas.height = SQUARE_SIZE;
-        const debugCtx = debugCanvas.getContext("2d");
-
-        if (debugCtx) {
-          debugCtx.putImageData(imageData, 0, 0);
-          const dataUrl = debugCanvas.toDataURL("image/png");
-          // console.log("Cropped Image:", dataUrl);
-        }
-
         const code = jsQR(imageData.data, imageData.width, imageData.height);
 
         // console.log("QR Code Result:", code ? code.data : "No QR detected");
@@ -150,6 +141,7 @@ const Scan: React.FC = () => {
               setShowErrorPopup(true);
             }
           } catch (error) {
+            console.error("Failed to upload QR data:", error);
             setShowMessage("Failed to upload cropped image");
             setShowErrorPopup(true);
           }
@@ -199,7 +191,7 @@ const Scan: React.FC = () => {
       document.removeEventListener("dblclick", handleDoubleClickOrTap);
       document.removeEventListener("touchstart", handleDoubleClickOrTap);
     };
-  }, []);
+  }, [handleSwitchCamera]);
   
   if (!mounted || loading) return <Loading />;
 
@@ -248,6 +240,7 @@ const Scan: React.FC = () => {
               setShowErrorPopup(true);
             }
           } catch (error) {
+            console.error("Failed to upload QR data:", error);
             setShowMessage("Failed to upload QR data");
             setShowErrorPopup(true);
           }
@@ -299,7 +292,7 @@ const Scan: React.FC = () => {
 
       {/* Top text */}
       <div className="absolute top-32 left-1/2 transform -translate-x-1/2 z-50">
-        <p className="text-white text-xl">KU Tech จำกัด</p>
+        <p className="text-white text-xl">{user.company}</p>
       </div>
 
       {/* Overlay */}

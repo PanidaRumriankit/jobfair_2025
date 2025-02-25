@@ -32,6 +32,7 @@ const Camera = forwardRef<CameraHandle>((props, ref) => {
           videoRef.current.srcObject = stream;
         }
       } catch (err) {
+        console.error("Error accessing camera:", err);
         setErrorMessage("Failed to access camera. Please check permissions.");
       }
     };

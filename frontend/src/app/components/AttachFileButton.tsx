@@ -38,8 +38,9 @@ const AttachFileButton: React.FC<AttachFileButtonProps> = ({ onFileChange }) => 
         className={`p-3 bg-white text-black rounded-full shadow-lg hover:bg-gray-200 transition-colors ${
           isPressed ? "bg-gray-200" : "bg-white"
         }`}
+        aria-label="Attach file"
       >
-        <Image className="w-8 h-8 text-gray-700" />
+        <Image className="w-8 h-8 text-gray-700"/>
       </button>
 
       {/* Hidden file input */}

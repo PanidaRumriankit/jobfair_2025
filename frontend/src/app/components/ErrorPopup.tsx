@@ -5,7 +5,6 @@ import cross from '../../../public/cross.png';
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
