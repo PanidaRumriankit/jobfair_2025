@@ -5,13 +5,14 @@ import { useTheme } from "next-themes";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import LoginForm from "@/components/LoginForm";
 import Loading from "@/components/Loading";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import LanguageSwitcher from "./components/LanguageSwitcher";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import LoginForm from "@/components/Loginform";
 import { ChevronRight } from 'lucide-react';
 import white_logo from "../../public/white_logo.png";
 import dark_logo from "../../public/dark_logo.png";
+
 
 const useAuth = () => {
   const [user, setUser] = useState<string | null>(null);
