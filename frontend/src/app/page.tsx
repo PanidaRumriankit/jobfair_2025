@@ -15,6 +15,7 @@ import dark_logo from "../../public/dark_logo.png";
 
 const useAuth = () => {
   const [user, setUser] = useState<string | null>(null);
+  const [company, setCompany] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,10 +28,12 @@ const useAuth = () => {
         if (response.ok) {
           const userData = await response.json();
           setUser(userData.username);
+          setCompany(userData.company);
         } else {
           setUser(null);
         }
       } catch (error) {
+        console.error("Error:", error);
         setUser(null);
       }
       setLoading(false);
@@ -39,14 +42,14 @@ const useAuth = () => {
     checkSession();
   }, []);
 
-  return { user, loading, setUser };
+  return { user, company, loading, setUser };
 };
 
 export default function Home() {
   const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useTheme();
-  const { user, loading, setUser } = useAuth();
+  const { user, company, loading, setUser } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -65,7 +68,7 @@ export default function Home() {
         <Image src={theme === "dark" ? dark_logo : white_logo} alt="KU Job Fair logo" width="228" height="159" />
         {user ? (
           <div className="flex flex-col items-center justify-center text-l dark:text-white">
-            <p>{user}</p>
+            <p>{company}</p>
             <button
               onClick={async () => {
                 await fetch("http://localhost:3000/auth/logout", {
