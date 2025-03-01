@@ -17,7 +17,7 @@ type ChartData = {
   value: number;
 };
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#FF6384"];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#FF6384", "#B0E57C", "#FFD700", "#FF69B4", "#FF4500"];
 
 const CustomTooltip = ({ active, payload, total }: { active?: boolean; payload?: any[]; total: number }) => {
   if (active && payload && payload.length) {
@@ -60,7 +60,18 @@ const Dashboard = () => {
           value: facultyCounts[key],
         }));
 
+        const majorCounts: Record<string, number> = values.reduce((acc, entry) => {
+          acc[entry.Major] = (acc[entry.Major] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+
+        const majorChartData: ChartData[] = Object.keys(majorCounts).map((key) => ({
+          name: key,
+          value: majorCounts[key],
+        }));
+
         setFacultyData(facultyChartData);
+        setMajorData(majorChartData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -73,31 +84,12 @@ const Dashboard = () => {
     const facultySet = new Set(students.map((s) => s.Faculty));
     const totalFaculties = facultySet.size;
 
-    const majorSet = new Set(
-      students.filter((s) => s.Faculty === selectedFaculty).map((s) => s.Major)
-    );
+    const majorSet = new Set(students.map((s) => s.Major));
     const totalMajors = majorSet.size;
+
     const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
   }, []);
-
-  const handleFacultyClick = (faculty: string) => {
-    setSelectedFaculty(faculty);
-
-    const filteredStudents = students.filter((s) => s.Faculty === faculty);
-
-    const majorCounts: Record<string, number> = filteredStudents.reduce((acc, entry) => {
-      acc[entry.Major] = (acc[entry.Major] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const majorChartData: ChartData[] = Object.keys(majorCounts).map((key) => ({
-      name: key,
-      value: majorCounts[key],
-    }));
-
-    setMajorData(majorChartData);
-  };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-white dark:bg-gray-900">
@@ -119,7 +111,6 @@ const Dashboard = () => {
               fill="#8884d8"
               stroke="none"
               label={false}
-              onClick={(_, index) => handleFacultyClick(facultyData[index].name)}
             >
               {facultyData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -130,10 +121,31 @@ const Dashboard = () => {
         </div>
 
         {/* Show Major Pie Chart when Faculty is Selected */}
-        {selectedFaculty && (
+        <div className="mt-10 flex flex-col items-center">
+          <h2 className="text-xl font-semibold mb-4">Majors in {selectedFaculty}</h2>
+          <h3 className="text-lg font-semibold mb-4">Total Majors: {majorData.length}</h3>
+          <PieChart width={400} height={400}>
+            <Pie
+              data={majorData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={120}
+              fill="#8884d8"
+              stroke="none"
+              label={false}
+            >
+              {majorData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip total={facultyData.reduce((sum, item) => sum + item.value, 0)} />} />
+          </PieChart>
+        </div>
+        {/* {selectedFaculty && (
           <div className="mt-10 flex flex-col items-center">
-            <h2 className="text-xl font-semibold mb-4">Majors in {selectedFaculty}</h2>
-            <h3 className="text-lg font-semibold mb-4">Total Majors: {majorData.length}</h3>
+            
             <PieChart width={400} height={400}>
               <Pie
                 data={majorData}
@@ -153,16 +165,8 @@ const Dashboard = () => {
               <Tooltip content={<CustomTooltip total={majorData.reduce((sum, item) => sum + item.value, 0)} />} />
             </PieChart>
           </div>
-        )}
+        )} */}
       </div>
-      {selectedFaculty && (
-        <button
-          className="mt-4 mb-4 px-4 py-2 bg-red-500 text-white rounded"
-          onClick={() => setSelectedFaculty(null)}
-        >
-          Back to Faculty Chart
-        </button>
-      )}
     </div>
   );
 };
