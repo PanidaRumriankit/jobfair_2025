@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PieChart, Pie, Tooltip, Cell } from "recharts";
+import { useTheme } from "next-themes";
+import { PieChart, Pie, Tooltip, Cell, LabelList } from "recharts";
 
 type StudentData = {
   QRCodeID: string;
@@ -17,7 +18,9 @@ type ChartData = {
   value: number;
 };
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#FF6384", "#B0E57C", "#FFD700", "#FF69B4", "#FF4500"];
+const generateRandomColor = () => {
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+};
 
 const CustomTooltip = ({ active, payload, total }: { active?: boolean; payload?: any[]; total: number }) => {
   if (active && payload && payload.length) {
@@ -34,11 +37,43 @@ const CustomTooltip = ({ active, payload, total }: { active?: boolean; payload?:
   return null;
 };
 
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1919', '#19FF32', '#1932FF'];
+
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+  index,
+}: {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+  index: number;
+}) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
 const Dashboard = () => {
+  const { theme } = useTheme();
   const [students, setStudents] = useState<StudentData[]>([]);
   const [facultyData, setFacultyData] = useState<ChartData[]>([]);
-  const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [majorData, setMajorData] = useState<ChartData[]>([]);
+  const [colorMap, setColorMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,6 +105,17 @@ const Dashboard = () => {
           value: majorCounts[key],
         }));
 
+        // Generate colors for new names
+        setColorMap((prevColors) => {
+          const newColors = { ...prevColors };
+          facultyChartData.forEach((entry) => {
+            if (!newColors[entry.name]) {
+              newColors[entry.name] = generateRandomColor();
+            }
+          });
+          return newColors;
+        });
+
         setFacultyData(facultyChartData);
         setMajorData(majorChartData);
       } catch (error) {
@@ -78,15 +124,6 @@ const Dashboard = () => {
     };
 
     fetchData();
-
-    const totalStudents = students.length;
-
-    const facultySet = new Set(students.map((s) => s.Faculty));
-    const totalFaculties = facultySet.size;
-
-    const majorSet = new Set(students.map((s) => s.Major));
-    const totalMajors = majorSet.size;
-
     const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -105,67 +142,44 @@ const Dashboard = () => {
               data={facultyData}
               dataKey="value"
               nameKey="name"
+              isAnimationActive={true}
               cx="50%"
               cy="50%"
-              outerRadius={120}
-              fill="#8884d8"
-              stroke="none"
-              label={false}
+              outerRadius={130}
+              label
             >
+              <LabelList dataKey="name" position="right" style={{ fontSize: "14px" }} />
               {facultyData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip total={facultyData.reduce((sum, item) => sum + item.value, 0)} />} />
           </PieChart>
         </div>
 
-        {/* Show Major Pie Chart when Faculty is Selected */}
+        {/* Major Pie Chart */}
         <div className="mt-10 flex flex-col items-center">
-          <h2 className="text-xl font-semibold mb-4">Majors in {selectedFaculty}</h2>
+          <h2 className="text-xl font-semibold mb-4">Majors</h2>
           <h3 className="text-lg font-semibold mb-4">Total Majors: {majorData.length}</h3>
           <PieChart width={400} height={400}>
             <Pie
               data={majorData}
               dataKey="value"
               nameKey="name"
+              isAnimationActive={true}
               cx="50%"
               cy="50%"
-              outerRadius={120}
-              fill="#8884d8"
-              stroke="none"
-              label={false}
+              outerRadius={130}
+              label
             >
+              <LabelList dataKey="name" position="right" style={{ fontSize: "14px" }} />
               {majorData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip total={facultyData.reduce((sum, item) => sum + item.value, 0)} />} />
+            <Tooltip content={<CustomTooltip total={majorData.reduce((sum, item) => sum + item.value, 0)} />} />
           </PieChart>
         </div>
-        {/* {selectedFaculty && (
-          <div className="mt-10 flex flex-col items-center">
-            
-            <PieChart width={400} height={400}>
-              <Pie
-                data={majorData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={120}
-                fill="#82ca9d"
-                stroke="none"
-                label={false}
-              >
-                {majorData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip total={majorData.reduce((sum, item) => sum + item.value, 0)} />} />
-            </PieChart>
-          </div>
-        )} */}
       </div>
     </div>
   );
