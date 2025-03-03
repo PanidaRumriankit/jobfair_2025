@@ -19,7 +19,7 @@ type ChartData = {
 
 const CustomTooltip: React.FC<TooltipProps<number, string> & { total: number }> = ({ active, payload, total }) => {
   if (active && payload && payload.length) {
-    const { name, value } = payload[0].payload as ChartData; // Ensure correct typing
+    const { name, value } = payload[0].payload as ChartData;
     const percentage = ((value / total) * 100).toFixed(2);
     return (
       <div className="bg-white dark:bg-gray-700 p-2 rounded shadow">
@@ -52,18 +52,8 @@ const Dashboard = () => {
 
         const today = new Date().toISOString();
         const studentsTodayData = values
-          .filter(student => student.Date === "2025-04-30T17:00:00.000Z") // TODO: Change to today's date
+          .filter(student => student.Date === today)
         setStudentsToday(studentsTodayData);
-
-        // const facultyCounts: Record<string, number> = values.reduce((acc, entry) => {
-        //   acc[entry.Faculty] = (acc[entry.Faculty] || 0) + 1;
-        //   return acc;
-        // }, {} as Record<string, number>);
-
-        // const facultyChartData: ChartData[] = Object.keys(facultyCounts).map((key) => ({
-        //   name: key,
-        //   value: facultyCounts[key],
-        // }));
 
         const majorCounts: Record<string, number> = studentsTodayData.reduce((acc, entry) => {
           acc[entry.Major] = (acc[entry.Major] || 0) + 1;
